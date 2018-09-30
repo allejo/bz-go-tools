@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
+	"time"
 )
 
 const CallSignLen = 32
@@ -39,12 +40,25 @@ type ReplayHeader struct {
 	realHash      []rune // hash of worldDatabase
 	worldSetting  []rune // the game settings
 
-	// @TODO
-	flags []rune // a list of the flags types
-	world []rune // the world
+	// Information that is not being tracked right now
+
+	//flags []rune // a list of the flags types
+	//world []rune // the world
 }
 
-func readRuneLength(buf *bytes.Buffer, length int) (arr []rune) {
+type ReplayPacket struct {
+	next        *ReplayPacket
+	prev        *ReplayHeader
+	mode        uint16
+	code        uint16
+	len         uint32
+	nextFilePos uint32
+	prevFilePos uint32
+	timestamp   int64
+	data        []byte
+}
+
+func unpackString(buf *bytes.Buffer, length int) (arr []rune) {
 	for i := 0; i < length; i++ {
 		ltr, _ := binary.ReadUvarint(buf)
 
@@ -70,17 +84,26 @@ func loadHeader(buf *bytes.Buffer, header *ReplayHeader) {
 	binary.Read(buf, binary.BigEndian, &header.flagsSize)
 	binary.Read(buf, binary.BigEndian, &header.worldSize)
 
-	header.callSign = readRuneLength(buf, CallSignLen)
-	header.motto = readRuneLength(buf, MottoLen)
-	header.ServerVersion = readRuneLength(buf, ServerLen)
-	header.appVersion = readRuneLength(buf, MessageLen)
-	header.realHash = readRuneLength(buf, HashLen)
-	header.worldSetting = readRuneLength(buf, 4+WorldSettingsSize)
+	header.callSign = unpackString(buf, CallSignLen)
+	header.motto = unpackString(buf, MottoLen)
+	header.ServerVersion = unpackString(buf, ServerLen)
+	header.appVersion = unpackString(buf, MessageLen)
+	header.realHash = unpackString(buf, HashLen)
+	header.worldSetting = unpackString(buf, 4+WorldSettingsSize)
+
+	// Skip the appropriate number of bytes since we don't really care about this
+	// data, for now
+
+	if header.flagsSize > 0 {
+		buf.Next(int(header.flagsSize))
+	}
+
+	buf.Next(int(header.worldSize))
 
 	return
 }
 
-func loadTimestamp(timestamp int64) (time Duration) {
+func calcDuration(timestamp int64) (time Duration) {
 	secs := timestamp / 1000000
 
 	time.days = int(secs / (24 * 60 * 60))
@@ -98,6 +121,24 @@ func loadTimestamp(timestamp int64) (time Duration) {
 	return
 }
 
+func loadPacket(buf *bytes.Buffer, packet *ReplayPacket) {
+	binary.Read(buf, binary.BigEndian, &packet.mode)
+	binary.Read(buf, binary.BigEndian, &packet.code)
+	binary.Read(buf, binary.BigEndian, &packet.len)
+	binary.Read(buf, binary.BigEndian, &packet.nextFilePos)
+	binary.Read(buf, binary.BigEndian, &packet.prevFilePos)
+	binary.Read(buf, binary.BigEndian, &packet.timestamp)
+
+	if packet.len == 0 {
+		packet.data = nil
+	} else {
+		packet.data = make([]byte, packet.len)
+		binary.Read(buf, binary.BigEndian, &packet.data)
+	}
+
+	return
+}
+
 func main() {
 	var header ReplayHeader
 
@@ -105,17 +146,17 @@ func main() {
 	buf := bytes.NewBuffer(dat)
 
 	loadHeader(buf, &header)
-	timeStruct := loadTimestamp(header.filetime)
+	timeStruct := calcDuration(header.filetime)
+
+	var p ReplayPacket
+	loadPacket(buf, &p)
 
 	fmt.Printf("magic:     0x%04X\n", header.magic)
 	fmt.Printf("replay:    version %d\n", header.version)
 	fmt.Printf("offset:    %d\n", header.offset)
 	fmt.Printf("length:    %-d days, %d hours, %d minutes, %d seconds, %d usecs\n", timeStruct.days, timeStruct.hours, timeStruct.mins, timeStruct.secs, timeStruct.usecs)
-
-	// @TODO
-	fmt.Printf("start:     ...\n")
-	fmt.Printf("end:       ...\n")
-
+	fmt.Printf("start:     %s\n", time.Unix(p.timestamp / 1000000, 0))
+	fmt.Printf("end:       %s\n", time.Unix((p.timestamp + header.filetime) / 1000000, 0))
 	fmt.Printf("author:    %s  (%s)\n", string(header.callSign), string(header.motto))
 	fmt.Printf("bzfs:      bzfs-%s\n", string(header.appVersion))
 	fmt.Printf("protocol:  %.8s\n", string(header.ServerVersion))
