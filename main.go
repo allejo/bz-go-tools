@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"time"
 )
@@ -33,17 +34,17 @@ type ReplayHeader struct {
 	player        uint32 // player that saved this record file
 	flagsSize     uint32 // size of the flags data
 	worldSize     uint32 // size of world database
-	callSign      []rune // player's callsign
-	motto         []rune // player's motto
-	ServerVersion []rune // BZFS protocol version
-	appVersion    []rune // BZFS application version
-	realHash      []rune // hash of worldDatabase
-	worldSetting  []rune // the game settings
+	callSign      []byte // player's callsign
+	motto         []byte // player's motto
+	ServerVersion []byte // BZFS protocol version
+	appVersion    []byte // BZFS application version
+	realHash      []byte // hash of worldDatabase
+	worldSetting  []byte // the game settings
 
 	// Information that is not being tracked right now
 
-	//flags []rune // a list of the flags types
-	//world []rune // the world
+	//flags []byte // a list of the flags types
+	//world []byte // the world
 }
 
 type ReplayPacket struct {
@@ -58,19 +59,10 @@ type ReplayPacket struct {
 	data        []byte
 }
 
-func unpackString(buf *bytes.Buffer, length int) (arr []rune) {
-	for i := 0; i < length; i++ {
-		ltr, _ := binary.ReadUvarint(buf)
-
-		// Once we've zero'd out, that means that there's no more data so skip
-		// the remaining bits
-		if ltr == 0 {
-			buf.Next(length - i - 1)
-			break
-		}
-
-		arr = append(arr, rune(ltr))
-	}
+func unpackString(buf *bytes.Buffer, length int) (dest []byte) {
+	dest = make([]byte, length)
+	io.ReadFull(buf, dest)
+	dest = bytes.Trim(dest, "\x00")
 
 	return
 }
@@ -133,7 +125,7 @@ func loadPacket(buf *bytes.Buffer, packet *ReplayPacket) {
 		packet.data = nil
 	} else {
 		packet.data = make([]byte, packet.len)
-		binary.Read(buf, binary.BigEndian, &packet.data)
+		io.ReadFull(buf, packet.data)
 	}
 
 	return
@@ -155,9 +147,9 @@ func main() {
 	fmt.Printf("replay:    version %d\n", header.version)
 	fmt.Printf("offset:    %d\n", header.offset)
 	fmt.Printf("length:    %-d days, %d hours, %d minutes, %d seconds, %d usecs\n", timeStruct.days, timeStruct.hours, timeStruct.mins, timeStruct.secs, timeStruct.usecs)
-	fmt.Printf("start:     %s\n", time.Unix(p.timestamp / 1000000, 0))
-	fmt.Printf("end:       %s\n", time.Unix((p.timestamp + header.filetime) / 1000000, 0))
-	fmt.Printf("author:    %s  (%s)\n", string(header.callSign), string(header.motto))
+	fmt.Printf("start:     %s\n", time.Unix(p.timestamp/1000000, 0))
+	fmt.Printf("end:       %s\n", time.Unix((p.timestamp+header.filetime)/1000000, 0))
+	fmt.Printf("author:    %s (%s)\n", string(header.callSign), string(header.motto))
 	fmt.Printf("bzfs:      bzfs-%s\n", string(header.appVersion))
 	fmt.Printf("protocol:  %.8s\n", string(header.ServerVersion))
 	fmt.Printf("flagSize:  %d\n", header.flagsSize)
