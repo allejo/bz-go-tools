@@ -18,6 +18,13 @@ const WorldSettingsSize = 30
 
 const ReplayFileName = "20170701-1926-fun.rec"
 
+const (
+	RealPacket   = 0 // broadcasted during replay
+	StatePacket  = 1 // broadcasted to those you aren't yet stateful
+	UpdatePacket = 2 // never broadcasted (only for replay use)
+	HiddenPacket = 3 // never broadcasted (stored for admin. purposes)
+)
+
 type Duration struct {
 	days  int
 	hours int
@@ -113,7 +120,7 @@ func calcDuration(timestamp int64) (time Duration) {
 	return
 }
 
-func loadPacket(buf *bytes.Buffer, packet *ReplayPacket) {
+func loadPacket(buf *bytes.Buffer) (packet ReplayPacket, err error) {
 	binary.Read(buf, binary.BigEndian, &packet.mode)
 	binary.Read(buf, binary.BigEndian, &packet.code)
 	binary.Read(buf, binary.BigEndian, &packet.len)
@@ -125,8 +132,11 @@ func loadPacket(buf *bytes.Buffer, packet *ReplayPacket) {
 		packet.data = nil
 	} else {
 		packet.data = make([]byte, packet.len)
-		io.ReadFull(buf, packet.data)
+		binary.Read(buf, binary.BigEndian, &packet.data)
 	}
+
+	// I genuinely have no idea wtf I need to bump 8 bytes here...
+	buf.Next(8)
 
 	return
 }
@@ -140,8 +150,7 @@ func main() {
 	loadHeader(buf, &header)
 	timeStruct := calcDuration(header.filetime)
 
-	var p ReplayPacket
-	loadPacket(buf, &p)
+	p, err := loadPacket(buf)
 
 	fmt.Printf("magic:     0x%04X\n", header.magic)
 	fmt.Printf("replay:    version %d\n", header.version)
@@ -155,4 +164,19 @@ func main() {
 	fmt.Printf("flagSize:  %d\n", header.flagsSize)
 	fmt.Printf("worldSize: %d\n", header.worldSize)
 	fmt.Printf("worldHash: %s\n", string(header.realHash))
+	fmt.Printf("\n")
+
+	for err == nil {
+		switch p.mode {
+		case RealPacket:
+
+		case StatePacket:
+
+		case UpdatePacket:
+			fmt.Printf("roarrrrrrr\n")
+			break
+		}
+
+		p, err = loadPacket(buf)
+	}
 }
