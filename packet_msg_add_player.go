@@ -9,8 +9,8 @@ type AddPlayerData struct {
 	PlayerIndex uint8  `json:"index"`
 	PlayerType  uint16 `json:"type"`
 	TeamValue   uint16 `json:"team"`
-	CallSign    []byte `json:"callsign"`
-	Motto       []byte `json:"motto"`
+	CallSign    string `json:"callsign"`
+	Motto       string `json:"motto"`
 	Score struct {
 		Wins        uint16 `json:"wins"`
 		Losses      uint16 `json:"losses"`

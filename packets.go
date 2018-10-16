@@ -28,12 +28,12 @@ type ReplayHeader struct {
 	player        uint32 // player that saved this record file
 	flagsSize     uint32 // size of the flags data
 	worldSize     uint32 // size of world database
-	callSign      []byte // player's callsign
-	motto         []byte // player's motto
-	ServerVersion []byte // BZFS protocol version
-	appVersion    []byte // BZFS application version
-	realHash      []byte // hash of worldDatabase
-	worldSetting  []byte // the game settings
+	callSign      string // player's callsign
+	motto         string // player's motto
+	ServerVersion string // BZFS protocol version
+	appVersion    string // BZFS application version
+	realHash      string // hash of worldDatabase
+	worldSetting  string // the game settings
 
 	// Information that is not being tracked right now
 
@@ -53,14 +53,14 @@ type ReplayPacket struct {
 	data        []byte
 }
 
-func unpackString(buf *bytes.Buffer, length int) (dest []byte) {
-	dest = make([]byte, length)
-	io.ReadFull(buf, dest)
+func unpackString(buf *bytes.Buffer, length int) (str string) {
+	unpacked := make([]byte, length)
+	io.ReadFull(buf, unpacked)
 
 	// Remove any NULL characters
-	dest = bytes.Trim(dest, "\x00")
+	unpacked = bytes.Trim(unpacked, "\x00")
 
-	return
+	return string(unpacked)
 }
 
 func loadReplayHeader(buf *bytes.Buffer, header *ReplayHeader) {

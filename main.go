@@ -52,12 +52,12 @@ func main() {
 	fmt.Printf("length:    %-d days, %d hours, %d minutes, %d seconds, %d usecs\n", timeStruct.days, timeStruct.hours, timeStruct.mins, timeStruct.secs, timeStruct.usecs)
 	fmt.Printf("start:     %s\n", time.Unix(p.timestamp/1000000, 0))
 	fmt.Printf("end:       %s\n", time.Unix((p.timestamp+header.filetime)/1000000, 0))
-	fmt.Printf("author:    %s (%s)\n", string(header.callSign), string(header.motto))
-	fmt.Printf("bzfs:      bzfs-%s\n", string(header.appVersion))
-	fmt.Printf("protocol:  %.8s\n", string(header.ServerVersion))
+	fmt.Printf("author:    %s (%s)\n", header.callSign, header.motto)
+	fmt.Printf("bzfs:      bzfs-%s\n", header.appVersion)
+	fmt.Printf("protocol:  %.8s\n", header.ServerVersion)
 	fmt.Printf("flagSize:  %d\n", header.flagsSize)
 	fmt.Printf("worldSize: %d\n", header.worldSize)
-	fmt.Printf("worldHash: %s\n", string(header.realHash))
+	fmt.Printf("worldHash: %s\n", header.realHash)
 	fmt.Printf("\n")
 
 	for err == nil {

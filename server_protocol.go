@@ -65,11 +65,11 @@ func packetToJson(len uint32, code uint16, data []byte) {
 		unm, err := json.Marshal(player)
 
 		if err != nil {
-			fmt.Print("Unable to read packet")
+			fmt.Print("Unable to marshal packet")
 			break
 		}
 
-		fmt.Print(string(unm))
+		fmt.Println(string(unm))
 		break
 	}
 }
