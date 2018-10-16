@@ -99,16 +99,16 @@ func loadReplayPacket(buf *bytes.Buffer) (packet ReplayPacket, err error) {
 	binary.Read(buf, binary.BigEndian, &packet.prevFilePos)
 	binary.Read(buf, binary.BigEndian, &packet.timestamp)
 
+	// The 2.4 protocol has an 8 byte padding for packets for some reason
+	//   https://git.io/fxufC
+	buf.Next(8)
+
 	if packet.len == 0 {
 		packet.data = nil
 	} else {
 		packet.data = make([]byte, packet.len)
 		binary.Read(buf, binary.BigEndian, &packet.data)
 	}
-
-	// The 2.4 protocol has an 8 byte padding for packets for some reason
-	//   https://git.io/fxufC
-	buf.Next(8)
 
 	return
 }
