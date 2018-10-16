@@ -63,11 +63,15 @@ func main() {
 	for err == nil {
 		switch p.mode {
 		case RealPacket:
+			fmt.Printf("Real Packet\n")
+			break
 
 		case StatePacket:
+			fmt.Printf("State Packet\n")
+			break
 
 		case UpdatePacket:
-			fmt.Printf("roarrrrrrr\n")
+			fmt.Printf("Update Packet\n")
 			break
 		}
 
