@@ -68,6 +68,7 @@ func main() {
 
 		case StatePacket:
 			fmt.Printf("State Packet\n")
+			packetToJson(p.len, p.code, p.data)
 			break
 
 		case UpdatePacket:
