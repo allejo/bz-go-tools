@@ -6,6 +6,7 @@ import (
 )
 
 type AddPlayerData struct {
+	Type		string `json:"type"`
 	PlayerIndex uint8  `json:"index"`
 	PlayerType  uint16 `json:"type"`
 	TeamValue   uint16 `json:"team"`
@@ -20,6 +21,8 @@ type AddPlayerData struct {
 
 func handleMsgAddPlayer(data []byte) (unpacked AddPlayerData) {
 	buf := bytes.NewBuffer(data)
+
+	unpacked.Type = "MsgAddPlayer"
 
 	binary.Read(buf, binary.BigEndian, &unpacked.PlayerIndex)
 	binary.Read(buf, binary.BigEndian, &unpacked.PlayerType)
