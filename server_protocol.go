@@ -53,10 +53,14 @@ const (
 	MsgPortalUpdate      = 0x5075 // 'Pu'
 )
 
-func packetDataToStruct(code uint16, data []byte) (packet interface{}){
+func packetDataToStruct(code uint16, data []byte) (packet interface{}) {
 	switch code {
 	case MsgAddPlayer:
 		packet = handleMsgAddPlayer(data)
+		break
+
+	case MsgSetVar:
+		packet = handleMsgSetVar(data)
 		break
 	}
 

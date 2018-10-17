@@ -11,10 +11,10 @@ type AddPlayerData struct {
 	TeamValue   uint16 `json:"team"`
 	CallSign    string `json:"callsign"`
 	Motto       string `json:"motto"`
-	Score struct {
-		Wins        uint16 `json:"wins"`
-		Losses      uint16 `json:"losses"`
-		Teamkills   uint16 `json:"teamkills"`
+	Score       struct {
+		Wins      uint16 `json:"wins"`
+		Losses    uint16 `json:"losses"`
+		Teamkills uint16 `json:"teamkills"`
 	} `json:"score"`
 }
 
