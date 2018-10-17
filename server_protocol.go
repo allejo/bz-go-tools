@@ -62,6 +62,10 @@ func packetDataToStruct(code uint16, data []byte) (packet interface{}) {
 	case MsgSetVar:
 		packet = handleMsgSetVar(data)
 		break
+
+	case MsgTeamUpdate:
+		packet = handleMsgTeamUpdate(data)
+		break
 	}
 
 	return
