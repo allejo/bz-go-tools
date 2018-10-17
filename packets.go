@@ -63,7 +63,7 @@ func unpackString(buf *bytes.Buffer, length int) (str string) {
 	return string(unpacked)
 }
 
-func loadReplayHeader(buf *bytes.Buffer, header *ReplayHeader) {
+func loadReplayHeader(buf *bytes.Buffer) (header ReplayHeader) {
 	binary.Read(buf, binary.BigEndian, &header.magic)
 	binary.Read(buf, binary.BigEndian, &header.version)
 	binary.Read(buf, binary.BigEndian, &header.offset)

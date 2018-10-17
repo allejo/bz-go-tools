@@ -37,12 +37,10 @@ func calcDuration(timestamp int64) (time Duration) {
 }
 
 func main() {
-	var header ReplayHeader
-
 	dat, _ := ioutil.ReadFile(ReplayFileName)
 	buf := bytes.NewBuffer(dat)
 
-	loadReplayHeader(buf, &header)
+	header := loadReplayHeader(buf)
 	timeStruct := calcDuration(header.filetime)
 
 	p, err := loadReplayPacket(buf)
