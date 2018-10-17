@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -61,6 +62,8 @@ func main() {
 	fmt.Printf("\n")
 
 	for err == nil {
+		var packet interface{}
+
 		switch p.mode {
 		case RealPacket:
 			fmt.Printf("Real Packet\n")
@@ -68,7 +71,7 @@ func main() {
 
 		case StatePacket:
 			fmt.Printf("State Packet\n")
-			packetToJson(p.len, p.code, p.data)
+			packet = packetDataToStruct(p.code, p.data)
 			break
 
 		case UpdatePacket:
@@ -76,6 +79,10 @@ func main() {
 			break
 		}
 
+		marshaled, _ := json.Marshal(packet)
+		fmt.Println(string(marshaled))
+
+		// Move on to the next packet
 		p, err = loadReplayPacket(buf)
 	}
 }

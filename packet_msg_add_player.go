@@ -18,7 +18,7 @@ type AddPlayerData struct {
 	} `json:"score"`
 }
 
-func handleMsgAddPlayer(len uint32, code uint16, data []byte) (unpacked AddPlayerData) {
+func handleMsgAddPlayer(data []byte) (unpacked AddPlayerData) {
 	buf := bytes.NewBuffer(data)
 
 	binary.Read(buf, binary.BigEndian, &unpacked.PlayerIndex)

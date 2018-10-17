@@ -1,10 +1,5 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-)
-
 const (
 	MsgAccept            = 0x6163 // 'ac'
 	MsgAdminInfo         = 0x6169 // 'ai'
@@ -58,18 +53,12 @@ const (
 	MsgPortalUpdate      = 0x5075 // 'Pu'
 )
 
-func packetToJson(len uint32, code uint16, data []byte) {
+func packetDataToStruct(code uint16, data []byte) (packet interface{}){
 	switch code {
 	case MsgAddPlayer:
-		player := handleMsgAddPlayer(len, code, data)
-		unm, err := json.Marshal(player)
-
-		if err != nil {
-			fmt.Print("Unable to marshal packet")
-			break
-		}
-
-		fmt.Println(string(unm))
+		packet = handleMsgAddPlayer(data)
 		break
 	}
+
+	return
 }
