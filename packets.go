@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
+	"math"
 )
 
 const CallSignLen = 32
@@ -53,7 +54,15 @@ type ReplayPacket struct {
 	data        []byte
 }
 
-func unpackString(buf *bytes.Buffer, length int) (str string) {
+func unpackFloat(buf *bytes.Buffer) float32 {
+	var value uint32
+
+	binary.Read(buf, binary.BigEndian, &value)
+
+	return math.Float32frombits(value)
+}
+
+func unpackString(buf *bytes.Buffer, length int) string {
 	unpacked := make([]byte, length)
 	io.ReadFull(buf, unpacked)
 
@@ -61,6 +70,14 @@ func unpackString(buf *bytes.Buffer, length int) (str string) {
 	unpacked = bytes.Trim(unpacked, "\x00")
 
 	return string(unpacked)
+}
+
+func unpackVector(buf *bytes.Buffer) (vector PositionVector) {
+	vector[0] = unpackFloat(buf)
+	vector[1] = unpackFloat(buf)
+	vector[2] = unpackFloat(buf)
+
+	return
 }
 
 func loadReplayHeader(buf *bytes.Buffer) (header ReplayHeader) {

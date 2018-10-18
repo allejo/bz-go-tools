@@ -53,6 +53,8 @@ const (
 	MsgPortalUpdate      = 0x5075 // 'Pu'
 )
 
+type PositionVector [3]float32
+
 func packetDataToStruct(code uint16, data []byte) (packet interface{}) {
 	switch code {
 	case MsgAddPlayer:
@@ -65,6 +67,10 @@ func packetDataToStruct(code uint16, data []byte) (packet interface{}) {
 
 	case MsgTeamUpdate:
 		packet = handleMsgTeamUpdate(data)
+		break
+
+	case MsgFlagUpdate:
+		packet = handleMsgFlagUpdate(data)
 		break
 	}
 
