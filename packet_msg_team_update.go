@@ -6,16 +6,14 @@ import (
 )
 
 type TeamUpdateData struct {
-	count uint8
-
-	Type string `json:"type"`
+	Type  string     `json:"type"`
 	Teams []TeamData `json:"teams"`
 }
 
 type TeamData struct {
-	Team uint16	`json:"team"`
-	Size uint16 `json:"size"`
-	Wins uint16 `json:"wins"`
+	Team   uint16 `json:"team"`
+	Size   uint16 `json:"size"`
+	Wins   uint16 `json:"wins"`
 	Losses uint16 `json:"losses"`
 }
 
@@ -24,10 +22,11 @@ func handleMsgTeamUpdate(data []byte) (unpacked TeamUpdateData) {
 
 	unpacked.Type = "MsgTeamUpdate"
 
-	binary.Read(buf, binary.BigEndian, &unpacked.count)
+	var count uint8
+	binary.Read(buf, binary.BigEndian, &count)
 
 	var i uint8
-	for i = 0; i < unpacked.count; i++ {
+	for i = 0; i < count; i++ {
 		var data TeamData
 
 		binary.Read(buf, binary.BigEndian, &data.Team)

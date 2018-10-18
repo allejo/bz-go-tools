@@ -69,13 +69,14 @@ func main() {
 
 		case StatePacket:
 			fmt.Printf("State Packet\n")
-			packet = packetDataToStruct(p.code, p.data)
 			break
 
 		case UpdatePacket:
 			fmt.Printf("Update Packet\n")
 			break
 		}
+
+		packet = packetDataToStruct(p.code, p.data)
 
 		marshaled, _ := json.Marshal(packet)
 		fmt.Println(string(marshaled))

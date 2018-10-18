@@ -27,7 +27,7 @@ type ReplayHeader struct {
 	offset        uint32 // length of the full header
 	filetime      int64  // amount of time in the file
 	player        uint32 // player that saved this record file
-	flagsSize     uint32 // size of the flags data
+	flagsSize     uint32 // size of the Flags data
 	worldSize     uint32 // size of world database
 	callSign      string // player's callsign
 	motto         string // player's motto
@@ -38,7 +38,7 @@ type ReplayHeader struct {
 
 	// Information that is not being tracked right now
 
-	//flags []byte // a list of the flags types
+	//Flags []byte // a list of the Flags types
 	//world []byte // the world
 }
 

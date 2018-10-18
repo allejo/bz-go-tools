@@ -6,7 +6,7 @@ import (
 )
 
 type AddPlayerData struct {
-	Type		string `json:"type"`
+	Type        string `json:"type"`
 	PlayerIndex uint8  `json:"index"`
 	PlayerType  uint16 `json:"type"`
 	TeamValue   uint16 `json:"team"`
