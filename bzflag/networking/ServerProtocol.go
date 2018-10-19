@@ -72,6 +72,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgAddPlayerPacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgAdminInfo):
+		var p MsgAdminInfoPacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgAlive):
 		var p MsgAlivePacket
 		return p.Unpack(buf)
