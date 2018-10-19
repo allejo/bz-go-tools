@@ -6,9 +6,9 @@ import (
 )
 
 type MsgDropFlagPacket struct {
-	Type string `json:"type"`
-	PlayerID uint8 `json:"playerID"`
-	Flag FlagData `json:"flag"`
+	Type     string   `json:"type"`
+	PlayerID uint8    `json:"playerID"`
+	Flag     FlagData `json:"flag"`
 }
 
 func (m *MsgDropFlagPacket) Unpack(buf *bytes.Buffer) (packet MsgDropFlagPacket) {
