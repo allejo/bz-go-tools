@@ -7,7 +7,7 @@ import (
 )
 
 type MsgAdminInfoPacket struct {
-	Type string `json:"type"`
+	Type    string       `json:"type"`
 	Players []PlayerInfo `json:"players"`
 }
 
