@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./bzflag/networking"
+	"./networking"
 	"bytes"
 	"encoding/json"
 	"fmt"
