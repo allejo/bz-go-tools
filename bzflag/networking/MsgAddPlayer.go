@@ -7,7 +7,7 @@ import (
 
 type MsgAddPlayerPacket struct {
 	Type        string `json:"type"`
-	PlayerIndex uint8  `json:"index"`
+	PlayerIndex uint8  `json:"playerID"`
 	PlayerType  uint16 `json:"type"`
 	TeamValue   uint16 `json:"team"`
 	CallSign    string `json:"callsign"`
