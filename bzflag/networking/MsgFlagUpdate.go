@@ -25,20 +25,6 @@ type MsgFlagUpdatePacket struct {
 	Flags []FlagData
 }
 
-type FlagData struct {
-	Index           uint16   `json:"index"`
-	Abbv            string   `json:"abbv"`
-	Status          uint16   `json:"status"`
-	Endurance       uint16   `json:"endurance"`
-	Owner           uint8    `json:"owner"`
-	Position        Vector3F `json:"position"`
-	LaunchPosition  Vector3F `json:"launchPos"`
-	LandingPosition Vector3F `json:"landingPos"`
-	FlightTime      float32  `json:"flightTime"`
-	FlightEnd       float32  `json:"flightEnd"`
-	InitialVelocity float32  `json:"initialVelocity"`
-}
-
 func (m *MsgFlagUpdatePacket) Unpack(buf *bytes.Buffer) (packet MsgFlagUpdatePacket) {
 	packet.Type = "MsgFlagUpdate"
 
@@ -47,23 +33,7 @@ func (m *MsgFlagUpdatePacket) Unpack(buf *bytes.Buffer) (packet MsgFlagUpdatePac
 
 	var i uint16
 	for i = 0; i < count; i++ {
-		var flag FlagData
-
-		binary.Read(buf, binary.BigEndian, &flag.Index)
-
-		flag.Abbv = UnpackString(buf, 2)
-
-		binary.Read(buf, binary.BigEndian, &flag.Status)
-		binary.Read(buf, binary.BigEndian, &flag.Endurance)
-		binary.Read(buf, binary.BigEndian, &flag.Owner)
-
-		flag.Position = UnpackVector(buf)
-		flag.LaunchPosition = UnpackVector(buf)
-		flag.LandingPosition = UnpackVector(buf)
-		flag.FlightTime = UnpackFloat(buf)
-		flag.FlightEnd = UnpackFloat(buf)
-		flag.InitialVelocity = UnpackFloat(buf)
-
+		flag := UnpackFlag(buf)
 		packet.Flags = append(packet.Flags, flag)
 	}
 
