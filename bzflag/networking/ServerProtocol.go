@@ -1,6 +1,9 @@
 package networking
 
-import "encoding/binary"
+import (
+	"bytes"
+	"encoding/binary"
+)
 
 const (
 	MsgAccept            = "ac"
@@ -56,32 +59,31 @@ const (
 )
 
 func codeFromChars(code string) uint16 {
-	bytes := []byte(code)
+	chars := []byte(code)
 
-	return binary.BigEndian.Uint16(bytes[0:2])
+	return binary.BigEndian.Uint16(chars[0:2])
 }
 
-func UnpackNetworkPacket(code uint16, data[]byte) (packet interface{}) {
+func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
+	buf := bytes.NewBuffer(data)
+
 	switch code {
 	case codeFromChars(MsgAddPlayer):
 		var p MsgAddPlayerPacket
-		packet = p.Unpack(data)
-		break
+		return p.Unpack(buf)
+
 
 	case codeFromChars(MsgSetVar):
 		var p MsgSetVarPacket
-		packet = p.Unpack(data)
-		break
+		return p.Unpack(buf)
 
 	case codeFromChars(MsgTeamUpdate):
 		var p MsgTeamUpdatePacket
-		packet = p.Unpack(data)
-		break
+		return p.Unpack(buf)
 
 	case codeFromChars(MsgFlagUpdate):
 		var p MsgFlagUpdatePacket
-		packet = p.Unpack(data)
-		break
+		return p.Unpack(buf)
 	}
 
 	return

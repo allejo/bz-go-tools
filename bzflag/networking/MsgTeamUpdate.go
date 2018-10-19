@@ -17,10 +17,8 @@ type TeamData struct {
 	Losses uint16 `json:"losses"`
 }
 
-func (m *MsgTeamUpdatePacket) Unpack(data []byte) (unpacked MsgTeamUpdatePacket) {
-	buf := bytes.NewBuffer(data)
-
-	unpacked.Type = "MsgTeamUpdate"
+func (m *MsgTeamUpdatePacket) Unpack(buf *bytes.Buffer) (packet MsgTeamUpdatePacket) {
+	packet.Type = "MsgTeamUpdate"
 
 	var count uint8
 	binary.Read(buf, binary.BigEndian, &count)
@@ -34,7 +32,7 @@ func (m *MsgTeamUpdatePacket) Unpack(data []byte) (unpacked MsgTeamUpdatePacket)
 		binary.Read(buf, binary.BigEndian, &data.Wins)
 		binary.Read(buf, binary.BigEndian, &data.Losses)
 
-		unpacked.Teams = append(unpacked.Teams, data)
+		packet.Teams = append(packet.Teams, data)
 	}
 
 	return

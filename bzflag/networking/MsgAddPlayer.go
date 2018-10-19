@@ -19,20 +19,18 @@ type MsgAddPlayerPacket struct {
 	} `json:"score"`
 }
 
-func (m *MsgAddPlayerPacket) Unpack(data []byte) (message MsgAddPlayerPacket) {
-	buf := bytes.NewBuffer(data)
+func (m *MsgAddPlayerPacket) Unpack(buf *bytes.Buffer) (packet MsgAddPlayerPacket) {
+	packet.Type = "MsgAddPlayer"
 
-	message.Type = "MsgAddPlayer"
+	binary.Read(buf, binary.BigEndian, &packet.PlayerIndex)
+	binary.Read(buf, binary.BigEndian, &packet.PlayerType)
+	binary.Read(buf, binary.BigEndian, &packet.TeamValue)
+	binary.Read(buf, binary.BigEndian, &packet.Score.Wins)
+	binary.Read(buf, binary.BigEndian, &packet.Score.Losses)
+	binary.Read(buf, binary.BigEndian, &packet.Score.Teamkills)
 
-	binary.Read(buf, binary.BigEndian, &message.PlayerIndex)
-	binary.Read(buf, binary.BigEndian, &message.PlayerType)
-	binary.Read(buf, binary.BigEndian, &message.TeamValue)
-	binary.Read(buf, binary.BigEndian, &message.Score.Wins)
-	binary.Read(buf, binary.BigEndian, &message.Score.Losses)
-	binary.Read(buf, binary.BigEndian, &message.Score.Teamkills)
-
-	message.CallSign = UnpackString(buf, CallSignLen)
-	message.Motto = UnpackString(buf, MottoLen)
+	packet.CallSign = UnpackString(buf, CallSignLen)
+	packet.Motto = UnpackString(buf, MottoLen)
 
 	return
 }

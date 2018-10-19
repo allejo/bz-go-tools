@@ -12,19 +12,17 @@ type MsgSetVarPacket struct {
 }
 
 type BZDBSetting struct {
-	Name    string `json:"name"`
-	Value    string `json:"value"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
-func (m *MsgSetVarPacket) Unpack(data []byte) (unpacked MsgSetVarPacket) {
-	buf := bytes.NewBuffer(data)
+func (m *MsgSetVarPacket) Unpack(buf *bytes.Buffer) (packet MsgSetVarPacket) {
+	packet.Type = "MsgSetVar"
 
-	unpacked.Type = "MsgSetVar"
-
-	binary.Read(buf, binary.BigEndian, &unpacked.count)
+	binary.Read(buf, binary.BigEndian, &packet.count)
 
 	var i uint16
-	for i = 0; i < unpacked.count; i++ {
+	for i = 0; i < packet.count; i++ {
 		var setting BZDBSetting
 
 		var nameLen uint8
@@ -35,7 +33,7 @@ func (m *MsgSetVarPacket) Unpack(data []byte) (unpacked MsgSetVarPacket) {
 		binary.Read(buf, binary.BigEndian, &valueLen)
 		setting.Value = UnpackString(buf, int(valueLen))
 
-		unpacked.Settings = append(unpacked.Settings, setting)
+		packet.Settings = append(packet.Settings, setting)
 	}
 
 	return
