@@ -1,11 +1,11 @@
-package main
+package networking
 
 import (
 	"bytes"
 	"encoding/binary"
 )
 
-type SetVarData struct {
+type MsgSetVarPacket struct {
 	count    uint16
 	Type     string        `json:"type"`
 	Settings []BZDBSetting `json:"settings"`
@@ -13,13 +13,10 @@ type SetVarData struct {
 
 type BZDBSetting struct {
 	Name    string `json:"name"`
-	nameLen uint8
-
 	Value    string `json:"value"`
-	valueLen uint8
 }
 
-func handleMsgSetVar(data []byte) (unpacked SetVarData) {
+func (m *MsgSetVarPacket) Unpack(data []byte) (unpacked MsgSetVarPacket) {
 	buf := bytes.NewBuffer(data)
 
 	unpacked.Type = "MsgSetVar"
@@ -30,11 +27,13 @@ func handleMsgSetVar(data []byte) (unpacked SetVarData) {
 	for i = 0; i < unpacked.count; i++ {
 		var setting BZDBSetting
 
-		binary.Read(buf, binary.BigEndian, &setting.nameLen)
-		setting.Name = unpackString(buf, int(setting.nameLen))
+		var nameLen uint8
+		binary.Read(buf, binary.BigEndian, &nameLen)
+		setting.Name = UnpackString(buf, int(nameLen))
 
-		binary.Read(buf, binary.BigEndian, &setting.valueLen)
-		setting.Value = unpackString(buf, int(setting.valueLen))
+		var valueLen uint8
+		binary.Read(buf, binary.BigEndian, &valueLen)
+		setting.Value = UnpackString(buf, int(valueLen))
 
 		unpacked.Settings = append(unpacked.Settings, setting)
 	}

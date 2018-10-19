@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./bzflag/networking"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -40,48 +41,48 @@ func main() {
 	dat, _ := ioutil.ReadFile(ReplayFileName)
 	buf := bytes.NewBuffer(dat)
 
-	header := loadReplayHeader(buf)
-	timeStruct := calcDuration(header.filetime)
+	header := networking.LoadReplayHeader(buf)
+	timeStruct := calcDuration(header.FileTime)
 
-	p, err := loadReplayPacket(buf)
+	p, err := networking.LoadReplayPacket(buf)
 
-	fmt.Printf("magic:     0x%04X\n", header.magic)
-	fmt.Printf("replay:    version %d\n", header.version)
-	fmt.Printf("offset:    %d\n", header.offset)
+	fmt.Printf("magic:     0x%04X\n", header.MagicNumber)
+	fmt.Printf("replay:    version %d\n", header.Version)
+	fmt.Printf("offset:    %d\n", header.Offset)
 	fmt.Printf("length:    %-d days, %d hours, %d minutes, %d seconds, %d usecs\n", timeStruct.days, timeStruct.hours, timeStruct.mins, timeStruct.secs, timeStruct.usecs)
-	fmt.Printf("start:     %s\n", time.Unix(p.timestamp/1000000, 0))
-	fmt.Printf("end:       %s\n", time.Unix((p.timestamp+header.filetime)/1000000, 0))
-	fmt.Printf("author:    %s (%s)\n", header.callSign, header.motto)
-	fmt.Printf("bzfs:      bzfs-%s\n", header.appVersion)
+	fmt.Printf("start:     %s\n", time.Unix(p.Timestamp/1000000, 0))
+	fmt.Printf("end:       %s\n", time.Unix((p.Timestamp+header.FileTime)/1000000, 0))
+	fmt.Printf("author:    %s (%s)\n", header.CallSign, header.Motto)
+	fmt.Printf("bzfs:      bzfs-%s\n", header.AppVersion)
 	fmt.Printf("protocol:  %.8s\n", header.ServerVersion)
-	fmt.Printf("flagSize:  %d\n", header.flagsSize)
-	fmt.Printf("worldSize: %d\n", header.worldSize)
-	fmt.Printf("worldHash: %s\n", header.realHash)
+	fmt.Printf("flagSize:  %d\n", header.FlagsSize)
+	fmt.Printf("worldSize: %d\n", header.WorldSize)
+	fmt.Printf("worldHash: %s\n", header.RealHash)
 	fmt.Printf("\n")
 
 	for err == nil {
 		var packet interface{}
 
-		switch p.mode {
-		case RealPacket:
+		switch p.Mode {
+		case networking.RealPacket:
 			fmt.Printf("Real Packet\n")
 			break
 
-		case StatePacket:
+		case networking.StatePacket:
 			fmt.Printf("State Packet\n")
 			break
 
-		case UpdatePacket:
+		case networking.UpdatePacket:
 			fmt.Printf("Update Packet\n")
 			break
 		}
 
-		packet = packetDataToStruct(p.code, p.data)
+		packet = networking.UnpackNetworkPacket(p.Code, p.Data)
 
 		marshaled, _ := json.Marshal(packet)
 		fmt.Println(string(marshaled))
 
 		// Move on to the next packet
-		p, err = loadReplayPacket(buf)
+		p, err = networking.LoadReplayPacket(buf)
 	}
 }

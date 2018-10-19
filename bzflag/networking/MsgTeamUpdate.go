@@ -1,11 +1,11 @@
-package main
+package networking
 
 import (
 	"bytes"
 	"encoding/binary"
 )
 
-type TeamUpdateData struct {
+type MsgTeamUpdatePacket struct {
 	Type  string     `json:"type"`
 	Teams []TeamData `json:"teams"`
 }
@@ -17,7 +17,7 @@ type TeamData struct {
 	Losses uint16 `json:"losses"`
 }
 
-func handleMsgTeamUpdate(data []byte) (unpacked TeamUpdateData) {
+func (m *MsgTeamUpdatePacket) Unpack(data []byte) (unpacked MsgTeamUpdatePacket) {
 	buf := bytes.NewBuffer(data)
 
 	unpacked.Type = "MsgTeamUpdate"

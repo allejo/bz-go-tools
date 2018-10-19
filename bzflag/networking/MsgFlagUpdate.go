@@ -1,4 +1,4 @@
-package main
+package networking
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ const (
 	FlagSticky          // can't be dropped normally
 )
 
-type FlagUpdateData struct {
+type MsgFlagUpdatePacket struct {
 	Type  string
 	Flags []FlagData
 }
@@ -31,15 +31,15 @@ type FlagData struct {
 	Status          uint16         `json:"status"`
 	Endurance       uint16         `json:"endurance"`
 	Owner           uint8          `json:"owner"`
-	Position        PositionVector `json:"position"`
-	LaunchPosition  PositionVector `json:"launchPos"`
-	LandingPosition PositionVector `json:"landingPos"`
+	Position        Vector3F `json:"position"`
+	LaunchPosition  Vector3F `json:"launchPos"`
+	LandingPosition Vector3F `json:"landingPos"`
 	FlightTime      float32        `json:"flightTime"`
 	FlightEnd       float32        `json:"flightEnd"`
 	InitialVelocity float32        `json:"initialVelocity"`
 }
 
-func handleMsgFlagUpdate(data []byte) (unpacked FlagUpdateData) {
+func (m *MsgFlagUpdatePacket) Unpack(data []byte) (unpacked MsgFlagUpdatePacket) {
 	buf := bytes.NewBuffer(data)
 
 	unpacked.Type = "MsgFlagUpdate"
@@ -53,18 +53,18 @@ func handleMsgFlagUpdate(data []byte) (unpacked FlagUpdateData) {
 
 		binary.Read(buf, binary.BigEndian, &flag.Index)
 
-		flag.Abbv = unpackString(buf, 2)
+		flag.Abbv = UnpackString(buf, 2)
 
 		binary.Read(buf, binary.BigEndian, &flag.Status)
 		binary.Read(buf, binary.BigEndian, &flag.Endurance)
 		binary.Read(buf, binary.BigEndian, &flag.Owner)
 
-		flag.Position = unpackVector(buf)
-		flag.LaunchPosition = unpackVector(buf)
-		flag.LandingPosition = unpackVector(buf)
-		flag.FlightTime = unpackFloat(buf)
-		flag.FlightEnd = unpackFloat(buf)
-		flag.InitialVelocity = unpackFloat(buf)
+		flag.Position = UnpackVector(buf)
+		flag.LaunchPosition = UnpackVector(buf)
+		flag.LandingPosition = UnpackVector(buf)
+		flag.FlightTime = UnpackFloat(buf)
+		flag.FlightEnd = UnpackFloat(buf)
+		flag.InitialVelocity = UnpackFloat(buf)
 
 		unpacked.Flags = append(unpacked.Flags, flag)
 	}
