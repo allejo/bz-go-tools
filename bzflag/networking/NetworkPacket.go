@@ -19,6 +19,8 @@ func UnpackFloat(buf *bytes.Buffer) float32 {
 }
 
 func UnpackIpAddress(buf *bytes.Buffer) net.IP {
+	// This byte was reserved for differentiating between IPv4 and IPv6 addresses
+	// However, since BZFlag only supports IPv4, this byte is skipped
 	buf.Next(1)
 
 	// IP Addresses are stored in network byte order (aka Little Endian)
