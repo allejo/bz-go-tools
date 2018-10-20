@@ -100,6 +100,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgKilledPacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgMessage):
+		var p MsgMessagePacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgFlagUpdate):
 		var p MsgFlagUpdatePacket
 		return p.Unpack(buf)
