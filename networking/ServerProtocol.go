@@ -104,6 +104,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgMessagePacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgNewRabbit):
+		var p MsgNewRabbitPacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgFlagUpdate):
 		var p MsgFlagUpdatePacket
 		return p.Unpack(buf)
