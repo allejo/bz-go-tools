@@ -88,6 +88,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgDropFlagPacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgGMUpdate):
+		var p MsgGMUpdatePacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgGrabFlag):
 		var p MsgFlagGrabPacket
 		return p.Unpack(buf)
