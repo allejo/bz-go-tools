@@ -124,6 +124,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgRemovePlayerPacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgScore):
+		var p MsgScorePacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgShotBegin):
 		var p MsgShotBeginPacket
 		return p.Unpack(buf)
