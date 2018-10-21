@@ -88,6 +88,10 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgDropFlagPacket
 		return p.Unpack(buf)
 
+	case codeFromChars(MsgFlagUpdate):
+		var p MsgFlagUpdatePacket
+		return p.Unpack(buf)
+
 	case codeFromChars(MsgGMUpdate):
 		var p MsgGMUpdatePacket
 		return p.Unpack(buf)
@@ -136,8 +140,20 @@ func UnpackNetworkPacket(code uint16, data []byte) (packet interface{}) {
 		var p MsgShotBeginPacket
 		return p.Unpack(buf)
 
-	case codeFromChars(MsgFlagUpdate):
-		var p MsgFlagUpdatePacket
+	case codeFromChars(MsgShotEnd):
+		var p MsgShotEndPacket
+		return p.Unpack(buf)
+
+	case codeFromChars(MsgTimeUpdate):
+		var p MsgTimeUpdatePacket
+		return p.Unpack(buf)
+
+	case codeFromChars(MsgTeleport):
+		var p MsgTeleportPacket
+		return p.Unpack(buf)
+
+	case codeFromChars(MsgTransferFlag):
+		var p MsgTransferFlagPacket
 		return p.Unpack(buf)
 
 	case codeFromChars(MsgSetVar):
