@@ -4,11 +4,11 @@ import (
 	"./networking"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 )
-
-const ReplayFileName = "20170701-1926-fun.rec"
 
 type Replay struct {
 	Header  networking.ReplayHeader `json:"header"`
@@ -16,7 +16,8 @@ type Replay struct {
 }
 
 func main() {
-	dat, _ := ioutil.ReadFile(ReplayFileName)
+	replayFile := os.Args[1]
+	dat, _ := ioutil.ReadFile(replayFile)
 	buf := bytes.NewBuffer(dat)
 
 	var replay Replay
@@ -35,5 +36,7 @@ func main() {
 	}
 
 	marshaled, _ := json.Marshal(replay)
-	fmt.Println(string(marshaled))
+	output := strings.Replace(replayFile, filepath.Ext(replayFile), ".json", 1)
+
+	ioutil.WriteFile(output, marshaled, 0644)
 }
