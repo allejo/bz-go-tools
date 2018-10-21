@@ -20,20 +20,30 @@ const (
 	HiddenPacket = 3 // never broadcasted (stored for admin. purposes)
 )
 
+type Duration struct {
+	Days         int `json:"days"`
+	Hours        int `json:"hours"`
+	Minutes      int `json:"mins"`
+	Seconds      int `json:"secs"`
+	Milliseconds int `json:"usecs"`
+}
+
 type ReplayHeader struct {
-	MagicNumber   uint32 // record file type identifier
-	Version       uint32 // record file version
-	Offset        uint32 // length of the full header
-	FileTime      int64  // amount of time in the file
-	Player        uint32 // player that saved this record file
-	FlagsSize     uint32 // size of the Flags data
-	WorldSize     uint32 // size of world database
-	CallSign      string // player's callsign
-	Motto         string // player's motto
-	ServerVersion string // BZFS protocol version
-	AppVersion    string // BZFS application version
-	RealHash      string // hash of worldDatabase
-	WorldSetting  string // the game settings
+	MagicNumber   uint32 `json:"magicNumber"`   // record file type identifier
+	Version       uint32 `json:"version"`       // record file version
+	Offset        uint32 `json:"offset"`        // length of the full header
+	FileTime      int64  `json:"fileTime"`      // amount of time in the file
+	Player        uint32 `json:"player"`        // player that saved this record file
+	FlagsSize     uint32 `json:"flagSize"`      // size of the Flags data
+	WorldSize     uint32 `json:"worldSize"`     // size of world database
+	CallSign      string `json:"callsign"`      // player's callsign
+	Motto         string `json:"motto"`         // player's motto
+	ServerVersion string `json:"serverVersion"` // BZFS protocol version
+	AppVersion    string `json:"appVersion"`    // BZFS application version
+	RealHash      string `json:"realHash"`      // hash of worldDatabase
+	WorldSetting  string `json:"worldSetting"`  // the game settings
+
+	Length Duration `json:"length"`
 
 	// Information that is not being tracked right now
 
@@ -49,6 +59,24 @@ type ReplayPacket struct {
 	PrevFilePos uint32
 	Timestamp   int64
 	Data        []byte
+}
+
+func calcDuration(timestamp int64, length *Duration) {
+	secs := timestamp / 1000000
+
+	length.Days = int(secs / (24 * 60 * 60))
+	secs %= 24 * 60 * 60
+
+	length.Hours = int(secs / (60 * 60))
+	secs %= 60 * 60
+
+	length.Minutes = int(secs / 60)
+	secs %= 60
+
+	length.Seconds = int(secs)
+	length.Milliseconds = int(timestamp % 1000000)
+
+	return
 }
 
 func LoadReplayHeader(buf *bytes.Buffer) (header ReplayHeader) {
@@ -75,6 +103,8 @@ func LoadReplayHeader(buf *bytes.Buffer) (header ReplayHeader) {
 	}
 
 	buf.Next(int(header.WorldSize))
+
+	calcDuration(header.FileTime, &header.Length)
 
 	return
 }

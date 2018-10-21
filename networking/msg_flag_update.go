@@ -21,8 +21,8 @@ const (
 )
 
 type MsgFlagUpdatePacket struct {
-	Type  string
-	Flags []FlagData
+	Type  string     `json:"type"`
+	Flags []FlagData `json:"flags"`
 }
 
 func (m *MsgFlagUpdatePacket) Unpack(buf *bytes.Buffer) (packet MsgFlagUpdatePacket) {
