@@ -11,7 +11,7 @@ type MsgRemovePlayerPacket struct {
 }
 
 func (m *MsgRemovePlayerPacket) Unpack(buf *bytes.Buffer) (packet MsgRemovePlayerPacket) {
-	packet.Type = "MsgPlayerRemove"
+	packet.Type = "MsgRemovePlayer"
 
 	binary.Read(buf, binary.BigEndian, &packet.PlayerID)
 
