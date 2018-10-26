@@ -5,6 +5,21 @@ import (
 	"encoding/binary"
 )
 
+const (
+	FlagNoExist  = iota // the flag is not present in the world
+	FlagOnGround        // the flag is sitting on the ground and can be picked up
+	FlagOnTank          // the flag is being carried by a tank
+	FlagInAir           // the flag is falling through the air
+	FlagComing          // the flag is entering the world
+	FlagGoing           // the flag is leaving the world
+)
+
+const (
+	FlagNormal   = iota // permanent flag
+	FlagUnstable        // disappears after use
+	FlagSticky          // can't be dropped normally
+)
+
 type FlagData struct {
 	Index           uint16   `json:"index"`
 	Abbv            string   `json:"abbv"`
