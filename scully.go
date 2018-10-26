@@ -31,10 +31,34 @@ type Player struct {
 	cTeam    uint16
 }
 
+type Flag struct {
+	Name      string
+	TeamValue uint16
+}
+
 type Analysis struct {
 	Players map[string]*Player
 
+	flags  map[uint16]Flag
 	roster map[uint8]*Player
+}
+
+func teamFlagToInt(flagAbbv string) uint16 {
+	switch flagAbbv {
+	case "R*":
+		return 1
+
+	case "G*":
+		return 2
+
+	case "B*":
+		return 3
+
+	case "P*":
+		return 4
+	}
+
+	return 0
 }
 
 func main() {
@@ -53,6 +77,7 @@ func main() {
 	var match Analysis
 	match.Players = make(map[string]*Player)
 	match.roster = make(map[uint8]*Player)
+	match.flags = make(map[uint16]Flag)
 
 	for err == nil {
 		var packet interface{}
@@ -60,6 +85,16 @@ func main() {
 		packet = networking.UnpackNetworkPacket(p.Code, p.Data)
 
 		switch packet := packet.(type) {
+		case networking.MsgFlagUpdatePacket:
+			for _, flag := range packet.Flags {
+				if _, ok := match.flags[flag.Index]; !ok {
+					match.flags[flag.Index] = Flag{
+						Name:      flag.Abbv,
+						TeamValue: teamFlagToInt(flag.Abbv),
+					}
+				}
+			}
+
 		case networking.MsgAddPlayerPacket:
 			var player *Player
 
@@ -107,6 +142,7 @@ func main() {
 		case networking.MsgCaptureFlagPacket:
 			capper := match.roster[packet.PlayerID]
 			record := CaptureRecord{
+				TeamCaptured:  match.flags[packet.FlagID].TeamValue,
 				TeamCapturing: capper.cTeam,
 				Timestamp:     p.Timestamp,
 			}
